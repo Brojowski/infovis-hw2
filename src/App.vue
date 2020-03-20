@@ -1,16 +1,28 @@
 <template>
   <div id="app">
+    <cars-vis></cars-vis>
+    <cereal-vis></cereal-vis>
     <film-vis></film-vis>
+    <grocery-vis></grocery-vis>
+    <mutual-vis></mutual-vis>
   </div>
 </template>
 
 <script>
-import FilmVis from './components/FilmVis.vue'
+import CarsVis from './components/Cars'
+import CerealVis from './components/Cereals'
+import FilmVis from './components/FilmVis'
+import GroceryVis from './components/GroceryStores'
+import MutualVis from './components/MutualFunds'
 
 export default {
   name: 'App',
   components: {
-    FilmVis 
+    CarsVis,
+    CerealVis,
+    FilmVis,
+    GroceryVis,
+    MutualVis
   }
 }
 </script>

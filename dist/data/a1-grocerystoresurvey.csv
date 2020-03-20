@@ -1,4 +1,5 @@
-age,gender,income,purchaseAmount,chain,paymentMethod,occupation,familySize
+Dataset: Grocery Store Survey,,,,,,,
+Age,Gender,Income,PurchaseAmount,Chain,PaymentMethod,Occupation,FamilySize
 33,Female,67800,569.99,Other,Cash,Retired,3
 64,Female,56900,558.85,Major D,StoreCard,Retired,2
 53,Female,26300,549.57,Major D,Check,Other,2

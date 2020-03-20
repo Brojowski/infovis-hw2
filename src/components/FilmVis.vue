@@ -21,7 +21,7 @@
       </div>
     </div>-->
 
-    <h1> Description </h1>
+    <h2> Description </h2>
     <p>
       This visualization displays the movies by time and popularity. The x-axis represents the year produced, the y axis how popular the movie was. 
       The different colors represent the category the movie comes from.
