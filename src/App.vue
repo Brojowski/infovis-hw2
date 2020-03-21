@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <!--<cars-vis></cars-vis>-->
-    <!--<cereal-vis></cereal-vis>-->
-    <!--<film-vis></film-vis>-->
-    <!--<grocery-vis></grocery-vis>-->
+    <cars-vis></cars-vis>
+    <cereal-vis></cereal-vis>
+    <film-vis></film-vis>
+    <grocery-vis></grocery-vis>
     <mutual-vis></mutual-vis>
   </div>
 </template>

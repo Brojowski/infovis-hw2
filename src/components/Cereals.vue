@@ -11,83 +11,197 @@
     <h2> Description </h2>
     <p>
     </p>
-
   </div>
 </template>
 
 <script>
+/* eslint no-unused-vars: "off" */
 import * as d3 from 'd3';
 
 export default {
   name: 'Cereals',
   mounted: function() {
-    let svgWidth = 1500;
-    let svgHeight = 1000;
+        // https://bl.ocks.org/jasondavies/1341281
 
-    let xProp = "year"
-    let yProp = "popularity"  
-    let colorProp = "length"
+        var margin = {top: 30, right: 10, bottom: 10, left: 10},
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+        
+        var x = d3.scalePoint()
+                .range([0, width])
+                .padding(.1),
+            y = {},
+            dragging = {};
+        
+        var line = d3.line(),
+            axis = d3.axisLeft(),
+            background,
+            foreground;
 
-    let vis3 = d3.select('#vis2')
-        .attr('width', svgWidth)
-        .attr('height', svgHeight);
+        var dimensions = [];
+        
+        var svg = d3.select("#vis2")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        
+        function renderVis(cars) {
 
-    let dataGroup = vis3.append('g')
-        .attr('class', 'films data-group');
+            cars = cars.slice(0,8)
+        
+          // Extract the list of dimensions and create a scale for each.
+          dimensions = d3.keys(cars[0]).filter(function(d) {
+            return d != "car" 
+                && d != "manufacturer"
+                && d != "origin"
+                && (y[d] = d3.scaleLinear()
+                    .domain(d3.extent(cars, function(p) { return +p[d]; }))
+                    .range([height, 0]));
+          })
 
-    let _this = this;
-    console.log((_this.categories))
-    function renderFilms(data) {
-      //console.log(data)
+           x.domain(dimensions);
 
-        let xScale = d3.scaleLinear()
-            .domain(d3.extent(data, (d) => d[xProp]))
-            .range([5, svgWidth-5])
-        let yScale = d3.scaleLinear()
-            .domain(d3.extent(data, (d) => d[yProp]))
-            .range([svgHeight-5, 5])
-        let alphaScale = d3.scaleLinear()
-            .domain(d3.extent(data, (d) => d[colorProp]))
-            .range([.1, 1])
-        let colorScale = d3.scaleOrdinal()
-            .domain(_this.categories)
-            .range(d3.schemeCategory10)
-        console.log(colorScale)
+          // Add grey background lines for context.
+          background = svg.append("g")
+              .attr("class", "background")
+            .selectAll("path")
+              .data(cars)
+            .enter().append("path")
+              .attr("d", path);
+        
+          // Add blue foreground lines for focus.
+          foreground = svg.append("g")
+              .attr("class", "foreground")
+            .selectAll("path")
+              .data(cars)
+            .enter().append("path")
+              .attr("d", path);
+        
+          // Add a group element for each dimension.
+          var g = svg.selectAll(".dimension")
+              .data(dimensions)
+            .enter().append("g")
+              .attr("class", "dimension")
+              .attr("transform", function(d) { return "translate(" + x(d) + ")"; })
+            //  .drag()
+            //    .origin(function(d) { return {x: x(d)}; })
+            //    .on("dragstart", function(d) {
+            //      dragging[d] = x(d);
+            //      background.attr("visibility", "hidden");
+            //    })
+            //    .on("drag", function(d) {
+            //      dragging[d] = Math.min(width, Math.max(0, d3.event.x));
+            //      foreground.attr("d", path);
+            //      dimensions.sort(function(a, b) { return position(a) - position(b); });
+            //      x.domain(dimensions);
+            //      g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
+            //    })
+            //    .on("dragend", function(d) {
+            //      delete dragging[d];
+            //      transition(d3.select(this)).attr("transform", "translate(" + x(d) + ")");
+            //      transition(foreground).attr("d", path);
+            //      background
+            //          .attr("d", path)
+            //        .transition()
+            //          .delay(500)
+            //          .duration(0)
+            //          .attr("visibility", null);
+            //    });
+        
+          // Add an axis and title.
+          g.append("g")
+              .attr("class", "axis")
+              .each(function(d) { d3.select(this).call(axis.scale(y[d])); })
+            .append("text")
+              .style("text-anchor", "middle")
+              .attr("y", -9)
+              .text(function(d) { return d; });
+        
+          // Add and store a brush for each axis.
+          // g.append("g")
+          //     .attr("class", "brush")
+          //     .each(function(d) {
+          //       d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brushstart", brushstart).on("brush", brush));
+          //     })
+          //   .selectAll("rect")
+          //     .attr("x", -8)
+          //     .attr("width", 16);
+        }
 
-        let circles = dataGroup.selectAll('circle').data(data);
+        function type(d) {
+            return d;
+        }
 
-        circles.enter().append('circle')
-            .attr('cx', (d) => xScale(d[xProp]))
-            .attr('cy', (d) => yScale(d[yProp]))
-            .attr('r', 5)
-            .style('fill', (d) => {
-              return d3.color(colorScale(d.subject)).copy({ opacity: alphaScale(d[colorProp]) })
-            })
-            .on('mouseover', function(d) {
-              _this.focused = d;
-            })
-
-        circles.exit().remove();
-    }
-    
-    function type(d) {
-        return d;
-    }
-
-    //console.log("a1-film")
-    d3.csv('data/a1-cereals.csv', type).then(renderFilms)
-  },
-  data: () => {
-    return {
-    };
+        d3.csv("data/a1-cars.csv", type).then(renderVis)
+        
+        function position(d) {
+          var v = dragging[d];
+          return v == null ? x(d) : v;
+        }
+        
+        function transition(g) {
+          return g.transition().duration(500);
+        }
+        
+        // Returns the path for a given data point.
+        function path(d) {
+          //return line(dimensions.map(function(p) { return [position(p), y[p](d[p])]; }));
+          return d3.line()
+                    .x(p => position(p))
+                    .y(p => y[p](d[p]))
+        }
+        
+        function brushstart() {
+          d3.event.sourceEvent.stopPropagation();
+        }
+        
+        // Handles a brush event, toggling the display of foreground lines.
+        function brush() {
+          var actives = dimensions.filter(function(p) { return !y[p].brush.empty(); }),
+              extents = actives.map(function(p) { return y[p].brush.extent(); });
+          foreground.style("display", function(d) {
+            return actives.every(function(p, i) {
+              return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+            }) ? null : "none";
+          });
+        }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#focusbox {
-  background-color: grey;
+svg {
+  font: 10px sans-serif;
 }
 
+.background path {
+  fill: none;
+  stroke: #ddd;
+  shape-rendering: crispEdges;
+}
+
+.foreground path {
+  fill: none;
+  stroke: steelblue;
+}
+
+.brush .extent {
+  fill-opacity: .3;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+  cursor: move;
+}
 </style>
