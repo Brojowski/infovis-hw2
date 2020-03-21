@@ -76,7 +76,7 @@ export default {
     }
 
     //console.log("a1-film")
-    d3.csv('data/a1-grocerystoresurvery.csv', type).then(renderFilms)
+    d3.csv('data/a1-grocerystoresurvey.csv	', type).then(renderFilms)
   },
   data: () => {
     return {

@@ -47,16 +47,13 @@ export default {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         
         function renderVis(cars) {
-
-            cars = cars.slice(0,8)
-        
           // Extract the list of dimensions and create a scale for each.
           dimensions = d3.keys(cars[0]).filter(function(d) {
-            return d != "car" 
+            return d != "cereal" 
                 && d != "manufacturer"
-                && d != "origin"
+                && d != "type"
                 && (y[d] = d3.scaleLinear()
-                    .domain(d3.extent(cars, function(p) { return +p[d]; }))
+                    .domain(d3.extent(cars, function(p) { return Number.parseFloat(p[d]); }))
                     .range([height, 0]));
           })
 
@@ -68,6 +65,8 @@ export default {
             .selectAll("path")
               .data(cars)
             .enter().append("path")
+              .attr("fill", "none")
+              .attr("stroke", "steelblue")
               .attr("d", path);
         
           // Add blue foreground lines for focus.
@@ -76,6 +75,8 @@ export default {
             .selectAll("path")
               .data(cars)
             .enter().append("path")
+              .attr("fill", "none")
+              .attr("stroke", "steelblue")
               .attr("d", path);
         
           // Add a group element for each dimension.
@@ -133,7 +134,7 @@ export default {
             return d;
         }
 
-        d3.csv("data/a1-cars.csv", type).then(renderVis)
+        d3.csv("data/a1-cereals.csv", type).then(renderVis)
         
         function position(d) {
           var v = dragging[d];
@@ -146,10 +147,7 @@ export default {
         
         // Returns the path for a given data point.
         function path(d) {
-          //return line(dimensions.map(function(p) { return [position(p), y[p](d[p])]; }));
-          return d3.line()
-                    .x(p => position(p))
-                    .y(p => y[p](d[p]))
+          return d3.line()(dimensions.map( p => [position(p), y[p](d[p])] ))
         }
         
         function brushstart() {
